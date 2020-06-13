@@ -1,0 +1,44 @@
+.line-part-remove {
+    background-color: 'red'
+}
+
+.line-part-add {
+    background-color: #46d246;
+}
+
+.line-content-prefix {
+    font-size: 9px;
+    padding-right:5px;
+}
+
+.line-content {
+    padding-left:5px;
+    padding-right:0px;
+    font-size:14px;
+}
+
+.line-content-unchanged {
+    background-color: #ffffff;
+}
+
+.line-content-changed-remove {
+    background-color: #ffb3b3;
+}
+
+.line-content-changed-add {
+    background-color: #adebad;
+}
+
+.line-content-offset {
+    background-color: #d9d9d9;
+}
+
+.line-row-wrapper {
+    background-color:#ced3db;
+}
+
+.line-marker {
+    flex: 0 0 40px; 
+    padding-right:3px;
+    font-size:10px; 
+}

@@ -80,27 +80,23 @@ function processDiff (diffLines) {
 
 function getLeftStyleContext () {
   return {
-    changeHighlightColor: 'red',
-    lineChangedColor: '#ffb3b3',
-    lineDefaultColor: '#ffffff',
-    lineOffsetColor: '#d9d9d9',
+    changeHighlightClass: 'line-part-remove',
+    lineChangedClass: 'line-content-changed-remove',
     lineContentPrefix: '-'
   };
 }
 
 function getRightStyleContext () {
   return {
-    changeHighlightColor: '#46d246',
-    lineChangedColor: '#adebad',
-    lineDefaultColor: '#ffffff',
-    lineOffsetColor: '#d9d9d9',
+    changeHighlightClass: 'line-part-add',
+    lineChangedClass: 'line-content-changed-add',
     lineContentPrefix: '+'
   };
 }
 
 function createLinePartHtml (styleContext, type, linePart) {
   if (type !== 0) {
-    return '<span style="background-color:' + styleContext.changeHighlightColor + ';">' + linePart + '</span>';
+    return `<span class="${styleContext.changeHighlightClass}">${linePart}</span>`;
   }
   return linePart;
 }
@@ -109,43 +105,43 @@ const TYPE_UNCHANGED_LINE = 1;
 const TYPE_CHANGED_LINE = 2;
 const TYPE_OFFSET_LINE = 3;
 
-function getLineBackgroundColor (styleContext, lineType) {
+function getLineStyleClass (styleContext, lineType) {
   switch (lineType) {
     case TYPE_UNCHANGED_LINE:
-      return styleContext.lineDefaultColor;
+      return 'line-content line-content-unchanged';
     case TYPE_CHANGED_LINE:
-      return styleContext.lineChangedColor;
+      return `line-content ${styleContext.lineChangedClass}`;
     case TYPE_OFFSET_LINE:
-      return styleContext.lineOffsetColor;
+      return 'line-content line-content-offset';
     default:
-      return '#000';
+      return 'line-content';
   }
 }
 
 function getLineContentPrefixHtml (styleContext, lineType) {
   switch (lineType) {
     case TYPE_CHANGED_LINE:
-      return `<span style="font-size: 9px;padding-right:5px;">${styleContext.lineContentPrefix}</span>`;
+      return `<span class="line-content-prefix">${styleContext.lineContentPrefix}</span>`;
     default:
       return '';
   }
 }
 
 function createLineContentHtml (styleContext, lineType, lineHtml) {
-  const backgroundColor = getLineBackgroundColor(styleContext, lineType);
+  const lineStyleClass = getLineStyleClass(styleContext, lineType);
   const lineContentPrefixHtml = getLineContentPrefixHtml(styleContext, lineType);
-  return `<div class="col" style="padding-left:5px;padding-right:0px;background-color:${backgroundColor};font-size:14px;">${lineContentPrefixHtml}${lineHtml}</div>`;
+  return `<div class="col ${lineStyleClass}">${lineContentPrefixHtml}${lineHtml}</div>`;
 }
 
 function createLineMarkerHtml (styleContext, lineMarker) {
-  return ` <div class="col text-right align-self-center" style="flex: 0 0 40px; padding-right:3px;font-size:10px; font-family:"Fixed, monospace">${lineMarker}</div>`;
+  return ` <div class="col text-right align-self-center line-marker">${lineMarker}</div>`;
 }
 
 function createLineRowHtml (styleContext, lineType, lineMarker = '&nbsp', lineHtml = '') {
   const lineMarkerHtml = createLineMarkerHtml(styleContext, lineMarker);
   const lineContentHtml = createLineContentHtml(styleContext, lineType, lineHtml);
   return `
-    <div class="row" style="background-color:#ced3db;">
+    <div class="row line-row-wrapper">
         ${lineMarkerHtml}
         ${lineContentHtml}
     </div>
