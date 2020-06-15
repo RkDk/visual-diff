@@ -1,13 +1,3 @@
-function updatePageMode (inEditModeOn) {
-  editModeOn = inEditModeOn;
-  if (editModeOn) {
-    hideMulti(['#diff-mode', '#diffButton']);
-    showMulti(['#input-mode', '#editButton']);
-  } else {
-    showMulti(['#diff-mode', '#diffButton']);
-    hideMulti(['#input-mode', '#editButton']);
-  }
-}
 
 function onInputSpacesChange () {
   AppState.minSpaces = $('#minSpacesInput').val();

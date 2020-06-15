@@ -11,6 +11,17 @@ function syncDOMToAppState () {
   $('#minSpacesInput').val(AppState.minSpaces);
 }
 
+function updatePageMode (inEditModeOn) {
+  AppState.editModeOn = inEditModeOn;
+  if (AppState.editModeOn) {
+    hideMulti(['#diff-mode', '#diffButton']);
+    showMulti(['#input-mode', '#editButton']);
+  } else {
+    showMulti(['#diff-mode', '#diffButton']);
+    hideMulti(['#input-mode', '#editButton']);
+  }
+}
+
 function togglePageMode () {
   updatePageMode(!AppState.editModeOn);
 }
