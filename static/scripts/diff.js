@@ -1,3 +1,29 @@
+const TYPE_UNCHANGED_LINE = 1;
+const TYPE_CHANGED_LINE = 2;
+const TYPE_OFFSET_LINE = 3;
+
+function convertSpacesToTabs (part, minSpaces = DEFAULT_MIN_SPACES) {
+  const matching = ` {${minSpaces}}`;
+  const regEx = new RegExp(matching, 'g');
+  return part.replace(regEx, '\t');
+}
+
+function convertTabsToSpans (part) {
+  return part.replace(/\t/g, '<span id="tab-block" class="tab-block"></span>');
+}
+
+function formatLinePart (part) {
+  const {
+    shouldConvertSpacesToTabs,
+    minSpaces
+  } = AppState;
+  const cleanedPart = escapeHtml(part);
+
+  return convertTabsToSpans(
+    shouldConvertSpacesToTabs ? convertSpacesToTabs(cleanedPart, minSpaces) : cleanedPart
+  );
+}
+
 function processDiff (diffLines) {
   const diff1Lines = [];
   const diff2Lines = [];
@@ -19,7 +45,7 @@ function processDiff (diffLines) {
     }
 
     lines.forEach((linePart, index) => {
-      const line = linePart.length ? linePart : ' ';
+      const line = linePart.length ? formatLinePart(linePart) : ' ';
       if (type === -1) {
         diff1Line.parts.push({ type, line });
         if (index < newlineCount) {
@@ -45,16 +71,16 @@ function processDiff (diffLines) {
         diff1Line.parts.push(n);
         diff2Line.parts.push(n);
         if (diff1Line.lineOffset === null) {
-          if (line2Marker > line1Marker + totalLine1Offset) {
-            diff1Line.lineOffset = line2Marker - (line1Marker + totalLine1Offset);
+          if (line2Marker + totalLine2Offset > line1Marker + totalLine1Offset) {
+            diff1Line.lineOffset = (line2Marker + totalLine2Offset) - (line1Marker + totalLine1Offset);
             totalLine1Offset += diff1Line.lineOffset;
           } else {
             diff1Line.lineOffset = 0;
           }
         }
         if (diff2Line.lineOffset === null) {
-          if (line1Marker > line2Marker + totalLine2Offset) {
-            diff2Line.lineOffset = line1Marker - (line2Marker + totalLine2Offset);
+          if (line1Marker + totalLine1Offset > line2Marker + totalLine2Offset) {
+            diff2Line.lineOffset = (line1Marker + totalLine1Offset) - (line2Marker + totalLine2Offset);
             totalLine2Offset += diff2Line.lineOffset;
           } else {
             diff2Line.lineOffset = 0;
@@ -101,10 +127,6 @@ function createLinePartHtml (styleContext, type, linePart) {
   return linePart;
 }
 
-const TYPE_UNCHANGED_LINE = 1;
-const TYPE_CHANGED_LINE = 2;
-const TYPE_OFFSET_LINE = 3;
-
 function getLineStyleClass (styleContext, lineType) {
   switch (lineType) {
     case TYPE_UNCHANGED_LINE:
@@ -130,11 +152,11 @@ function getLineContentPrefixHtml (styleContext, lineType) {
 function createLineContentHtml (styleContext, lineType, lineHtml) {
   const lineStyleClass = getLineStyleClass(styleContext, lineType);
   const lineContentPrefixHtml = getLineContentPrefixHtml(styleContext, lineType);
-  return `<div class="col ${lineStyleClass}">${lineContentPrefixHtml}${lineHtml}</div>`;
+  return `<div class="col h-100 ${lineStyleClass}">${lineContentPrefixHtml}${lineHtml}</div>`;
 }
 
 function createLineMarkerHtml (styleContext, lineMarker) {
-  return ` <div class="col text-right align-self-center line-marker">${lineMarker}</div>`;
+  return ` <div class="col h-100 line-marker">${lineMarker}</div>`;
 }
 
 function createLineRowHtml (styleContext, lineType, lineMarker = '&nbsp', lineHtml = '') {
@@ -193,55 +215,12 @@ function createDiffHtml (diffData) {
 function setDiffHtml (diffHtml) {
   const { diff1Html, diff2Html } = diffHtml;
 
-  const diff1El = document.getElementById('lDiff');
-  diff1El.innerHTML = diff1Html;
-
-  const diff2El = document.getElementById('rDiff');
-  diff2El.innerHTML = diff2Html;
+  $('#lDiff').html(diff1Html);
+  $('#rDiff').html(diff2Html);
 }
 
-let editModeOn = true;
-
-function togglePageMode () {
-  updatePageMode(!editModeOn);
-}
-
-function setEditMode () {
-  updatePageMode(true);
-}
-
-function setDiffMode () {
-  updatePageMode(false);
-}
-
-function updatePageMode (inEditModeOn) {
-  editModeOn = inEditModeOn;
-  if (editModeOn) {
-    $('#diff-mode').hide();
-    $('#input-mode').show();
-  } else {
-    $('#diff-mode').show();
-    $('#input-mode').hide();
-  }
-}
-
-function onDiff () {
-  const lBody = $('#lBody').val();
-  const rBody = $('#rBody').val();
-  const headers = {
-    'Content-Type': 'application/json'
-  };
-  const data = JSON.stringify({ lBody, rBody });
-  $.ajax({
-    url: '/diff',
-    type: 'post',
-    headers,
-    data,
-    success: function (response) {
-      const diffData = processDiff(response);
-      const diffHtml = createDiffHtml(diffData);
-      setDiffHtml(diffHtml);
-      setDiffMode();
-    }
-  });
+function processDiffsFromData (data) {
+  const diffData = processDiff(data);
+  const diffHtml = createDiffHtml(diffData);
+  setDiffHtml(diffHtml);
 }
