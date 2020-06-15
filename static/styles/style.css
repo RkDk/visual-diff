@@ -13,7 +13,8 @@
 
 .line-content-prefix {
     font-size: 9px;
-    padding-right:5px;
+    display: inline-block;
+    width: 10px;
 }
 
 .line-content {

@@ -145,7 +145,7 @@ function getLineContentPrefixHtml (styleContext, lineType) {
     case TYPE_CHANGED_LINE:
       return `<span class="line-content-prefix">${styleContext.lineContentPrefix}</span>`;
     default:
-      return '';
+      return '<span class="line-content-prefix">&nbsp;</span>';
   }
 }
 

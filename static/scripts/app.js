@@ -3,11 +3,13 @@ var AppState = {
   minSpaces: DEFAULT_MIN_SPACES,
   shouldConvertSpacesToTabs: DEFAULT_CONVERT_SPACES_TO_TABS,
   diffData: {},
-  editModeOn: true
+  editModeOn: true,
+  shouldWordWrap: true
 };
 
 function syncDOMToAppState () {
   $('#convertSpacesToTabsInput').prop('checked', AppState.shouldConvertSpacesToTabs);
+  $('#enableWordWrapInput').prop('checked', AppState.shouldWordWrap);
   $('#minSpacesInput').val(AppState.minSpaces);
 }
 
@@ -35,11 +37,15 @@ function setDiffMode () {
 }
 
 function getDiffApiData () {
-  const lBody = $('#lBody').val();
-  const rBody = $('#rBody').val();
+  let lBody = $('#lBody').val();
+  let rBody = $('#rBody').val();
   const headers = {
     'Content-Type': 'application/json'
   };
+  if (AppState.shouldWordWrap) {
+    lBody = enforceWordWrapping(lBody);
+    rBody = enforceWordWrapping(rBody);
+  }
   const data = JSON.stringify({ lBody, rBody });
   $.ajax({
     url: '/diff',

@@ -9,7 +9,10 @@ body
             div(class="row" class="bottom-padding-10")
                 div(class="col")
                     div(class="form-check")
-                        input(class="form-check-input" type="checkbox" value="" id="convertSpacesToTabsInput" onClick="onConvertSpaceToggle(event);")
+                        input(class="form-check-input" type="checkbox" value="" id="enableWordWrapInput" onClick="onWordWrapToggle();")
+                        label(class="form-check-label" for="enableWordWrapInput")  Enable word wrapping
+                    div(class="form-check")
+                        input(class="form-check-input" type="checkbox" value="" id="convertSpacesToTabsInput" onClick="onConvertSpaceToggle();")
                         label(class="form-check-label" for="convertSpacesToTabsInput")  Convert spaces to tabs
                         div(class="padding-indent" id="inputSpacesForm" oninput="onInputSpacesChange()")
                             label(for="minSpacesInput" class="num-spaces-label") Number of spaces
