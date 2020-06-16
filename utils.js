@@ -2,7 +2,9 @@ const TextDiff = require('text-diff');
 
 function getDiff (lBody, rBody) {
   const textDiffer = new TextDiff();
-  return textDiffer.main(lBody, rBody);
+  const diff = textDiffer.main(lBody, rBody);
+  textDiffer.cleanupSemantic(diff);
+  return diff;
 }
 
 module.exports = { getDiff };
